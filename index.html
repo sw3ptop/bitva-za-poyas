@@ -426,7 +426,7 @@ const afterWrite = () => {};
 
 /* ---------- events ---------- */
 document.addEventListener('click', async ev=>{
-  const b = ev.target.closest('button'); if(!b || b.type==='submit') return;
+  const b = ev.target.closest('button'); if(!b || b.closest('form')) return;
   if (b.dataset.s){ const el=$(b.dataset.s); el.value=Math.max(0,Math.min(99,(parseInt(el.value)||0)+Number(b.dataset.d))); return; }
   if (b.id==='prevW'){ S.week--; S.armed=null; render(); return; }
   if (b.id==='nextW'){ if(S.week<0) S.week++; S.armed=null; render(); return; }
