@@ -4,10 +4,10 @@
 <style>
 /* Layout: matchday broadcast screen — belt hero, then standings beside the match entry panel, results ticker below. Deliberately single dark theme. */
 :root{
-  --bg:#0c0f24; --pitch:#121638; --panel:#171c45; --line:#2a3170;
-  --fg:#eef0ff; --muted:#9aa1d6;
+  --bg:#070707; --pitch:#141414; --panel:#0e0e0e; --line:#2a2519;
+  --fg:#f4f0e6; --muted:#9b9383;
   --gold:#f2c14e; --gold-deep:#b9862a;
-  --cyan:#3ee6d2; --win:#3ee68a; --draw:#c9cbe6; --loss:#ff5d73;
+  --cyan:#e9cf86; --win:#4ade80; --draw:#d6d0c2; --loss:#ff5d73;
   --f-display:"Teko","Barlow Condensed",Impact,sans-serif;
   --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-num:"Barlow Condensed","Barlow",system-ui,sans-serif;
@@ -15,7 +15,7 @@
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
-  background-image:radial-gradient(1200px 500px at 50% -120px,#2b2f86 0%,transparent 70%),
+  background-image:radial-gradient(1200px 520px at 50% -140px,#2b2112 0%,transparent 70%),
   repeating-linear-gradient(90deg,transparent 0 80px,rgba(255,255,255,.018) 80px 160px);}
 .wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:22px}
 button,input,select{font:inherit;color:inherit}
@@ -33,7 +33,7 @@ button{cursor:pointer}
 
 /* hero belt */
 .hero{position:relative;overflow:hidden;border-radius:18px;padding:22px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;
-  background:radial-gradient(ellipse at 24% 50%,#000 0%,#050508 42%,#141842 100%);border:1px solid var(--line)}
+  background:radial-gradient(ellipse at 24% 50%,#000 0%,#030303 45%,#17130b 100%);border:1px solid #3a3020}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 40%,rgba(242,193,78,.12) 50%,transparent 60%);transform:translateX(-100%);animation:sheen 6s ease-in-out infinite;pointer-events:none}
 @keyframes sheen{0%,60%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .belt{width:min(440px,100%);max-width:100%;height:auto;display:block;-webkit-mask-image:radial-gradient(ellipse 70% 72% at 50% 50%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 70% 72% at 50% 50%,#000 60%,transparent 100%)}
@@ -47,7 +47,7 @@ button{cursor:pointer}
 
 /* panels */
 .grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:start}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:linear-gradient(180deg,#141414,var(--panel) 140px);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .ph h2{font-family:var(--f-display);font-size:30px;font-weight:600;line-height:.9;text-transform:uppercase;margin:0;padding-top:4px;letter-spacing:.02em}
 .weeknav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -73,7 +73,7 @@ tr.first .pos{color:var(--gold)}
 .pts{font-size:22px;color:var(--gold)}
 .gd.pos-v{color:var(--win)} .gd.neg-v{color:var(--loss)}
 .form{display:flex;gap:3px;justify-content:center}
-.form i{width:18px;height:18px;border-radius:4px;font-style:normal;font-size:11px;line-height:18px;font-weight:700;color:#0c0f24}
+.form i{width:18px;height:18px;border-radius:4px;font-style:normal;font-size:11px;line-height:18px;font-weight:700;color:#0a0a0a}
 .form .W{background:var(--win)} .form .D{background:var(--draw)} .form .L{background:var(--loss)}
 .crest{flex:none}
 
@@ -139,7 +139,7 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
 <div class="wrap" id="app">
   <header class="top">
     <div class="brand">
-      <svg width="34" height="38" viewBox="0 0 34 38" aria-hidden="true"><path d="M17 1 32 6v12c0 9-6 15-15 19C8 33 2 27 2 18V6z" fill="#f2c14e"/><path d="M17 8l2.6 5.4 5.9.8-4.3 4.1 1 5.8L17 21.3l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="#0c0f24"/></svg>
+      <svg width="34" height="38" viewBox="0 0 34 38" aria-hidden="true"><path d="M17 1 32 6v12c0 9-6 15-15 19C8 33 2 27 2 18V6z" fill="#f2c14e"/><path d="M17 8l2.6 5.4 5.9.8-4.3 4.1 1 5.8L17 21.3l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="#0a0a0a"/></svg>
       <h1>Битва за <span>пояс</span></h1>
     </div>
     <div class="sync" id="sync"><i></i><span>Подключение…</span></div>
@@ -266,9 +266,9 @@ const inWeek = off => { const [s,e]=weekRange(off); return S.matches.filter(m=>m
 const pl = id => S.players.find(p=>p.id===id);
 const nameOf = id => pl(id)?.name || 'Игрок';
 function crest(id, size=28){
-  const p = pl(id); const c = p?.color || '#9aa1d6';
+  const p = pl(id); const c = p?.color || '#9b9383';
   const ini = (p?.name||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  return `<svg class="crest" width="${size}" height="${size*1.12}" viewBox="0 0 28 31" aria-hidden="true"><path d="M14 1 26 5v10c0 7.5-5 12.5-12 15C7 27.5 2 22.5 2 15V5z" fill="${c}"/><path d="M14 1 26 5v10c0 7.5-5 12.5-12 15z" fill="rgba(0,0,0,.18)"/><text x="14" y="20" text-anchor="middle" font-family="Teko,sans-serif" font-size="14" font-weight="700" fill="#0c0f24">${esc(ini)}</text></svg>`;
+  return `<svg class="crest" width="${size}" height="${size*1.12}" viewBox="0 0 28 31" aria-hidden="true"><path d="M14 1 26 5v10c0 7.5-5 12.5-12 15C7 27.5 2 22.5 2 15V5z" fill="${c}"/><path d="M14 1 26 5v10c0 7.5-5 12.5-12 15z" fill="rgba(0,0,0,.18)"/><text x="14" y="20" text-anchor="middle" font-family="Teko,sans-serif" font-size="14" font-weight="700" fill="#0a0a0a">${esc(ini)}</text></svg>`;
 }
 
 /* ---------- render ---------- */
