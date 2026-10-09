@@ -33,10 +33,10 @@ button{cursor:pointer}
 
 /* hero belt */
 .hero{position:relative;overflow:hidden;border-radius:18px;padding:22px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;
-  background:linear-gradient(115deg,#1d2266 0%,#141842 55%,#2a1f3f 100%);border:1px solid var(--line)}
+  background:radial-gradient(ellipse at 24% 50%,#000 0%,#050508 42%,#141842 100%);border:1px solid var(--line)}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 40%,rgba(242,193,78,.12) 50%,transparent 60%);transform:translateX(-100%);animation:sheen 6s ease-in-out infinite;pointer-events:none}
 @keyframes sheen{0%,60%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-.belt{width:min(420px,100%);max-width:100%;height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.55)) drop-shadow(0 0 30px rgba(242,193,78,.18))}
+.belt{width:min(440px,100%);max-width:100%;height:auto;display:block;-webkit-mask-image:radial-gradient(ellipse 70% 72% at 50% 50%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 70% 72% at 50% 50%,#000 60%,transparent 100%)}
 .hero-txt{display:flex;flex-direction:column;gap:6px;min-width:0}
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
 .holder{font-family:var(--f-display);font-size:58px;line-height:.85;font-weight:600;text-transform:uppercase;margin:4px 0 0;text-wrap:balance;overflow-wrap:anywhere}
@@ -117,6 +117,11 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
 .btn2{height:40px;border-radius:8px;border:1px solid var(--cyan);background:transparent;color:var(--cyan);font-weight:600;padding:0 14px}
 .note{font-size:12px;color:var(--muted)}
 .ro .cta,.ro .addp,.ro .del,.ro .score button{display:none}
+.reset{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.reset input{flex:1 1 140px;background:var(--pitch);border:1px solid var(--line);border-radius:8px;height:40px;padding:0 10px}
+.btnDanger{height:40px;border-radius:8px;border:1px solid var(--loss);background:transparent;color:var(--loss);font-weight:600;padding:0 14px}
+.linkBtn{align-self:flex-start;background:none;border:0;color:var(--muted);font-size:13px;text-decoration:underline;padding:0}
+.resetBox{display:flex;flex-direction:column;gap:8px}
 .ro .codebar .addp{display:flex}
 .codebar{background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
 .codebar label{font-weight:600}
@@ -142,66 +147,7 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
 
 
   <section class="hero" aria-label="Чемпион">
-    <svg class="belt" viewBox="0 0 520 200" role="img" aria-label="Чемпионский пояс">
-      <defs>
-        <linearGradient id="beltGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1c2"/><stop offset=".35" stop-color="#f2c14e"/><stop offset=".7" stop-color="#c8902e"/><stop offset="1" stop-color="#7a5418"/></linearGradient>
-        <linearGradient id="beltGoldH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe39a"/><stop offset=".5" stop-color="#d9a23b"/><stop offset="1" stop-color="#8a5f1c"/></linearGradient>
-        <linearGradient id="beltStrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2b30"/><stop offset=".5" stop-color="#121216"/><stop offset="1" stop-color="#050507"/></linearGradient>
-        <radialGradient id="beltCore" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#2b3290"/><stop offset="1" stop-color="#0c0f24"/></radialGradient>
-        <radialGradient id="beltGem" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#ff9aa8"/><stop offset=".5" stop-color="#d81b3a"/><stop offset="1" stop-color="#5e0614"/></radialGradient>
-        <path id="beltArcTop" d="M196 100 A64 64 0 0 1 324 100"/>
-        <path id="beltArcBot" d="M194 100 A66 66 0 0 0 326 100"/>
-      </defs>
-      <!-- strap -->
-      <path d="M4 74 Q2 100 4 126 L516 126 Q518 100 516 74 Z" fill="url(#beltStrap)"/>
-      <path d="M10 80 H510 M10 120 H510" stroke="#6b5636" stroke-width="1.2" stroke-dasharray="5 4"/>
-      <!-- outer side plates -->
-      <g fill="url(#beltGold)" stroke="#6a4612" stroke-width="1.5">
-        <rect x="18" y="80" width="36" height="40" rx="6"/><rect x="466" y="80" width="36" height="40" rx="6"/>
-      </g>
-      <g fill="url(#beltGem)"><circle cx="36" cy="100" r="7"/><circle cx="484" cy="100" r="7"/></g>
-      <!-- side plates -->
-      <g stroke="#6a4612" stroke-width="2">
-        <path d="M72 64 H150 L162 76 V124 L150 136 H72 L60 124 V76 Z" fill="url(#beltGold)"/>
-        <path d="M448 64 H370 L358 76 V124 L370 136 H448 L460 124 V76 Z" fill="url(#beltGold)"/>
-      </g>
-      <g fill="url(#beltCore)" stroke="#f2c14e" stroke-width="1.5">
-        <path d="M78 74 H144 L152 82 V118 L144 126 H78 L70 118 V82 Z"/>
-        <path d="M442 74 H376 L368 82 V118 L376 126 H442 L450 118 V82 Z"/>
-      </g>
-      <g font-family="Teko,sans-serif" font-weight="700" fill="#f2c14e" text-anchor="middle">
-        <text x="111" y="100" font-size="22">FC</text><text x="111" y="119" font-size="15" letter-spacing="1">2026</text>
-        <text x="409" y="100" font-size="22">VS</text><text x="409" y="119" font-size="15" letter-spacing="1">ROOM</text>
-      </g>
-      <!-- center plate -->
-      <polygon points="343,134 294,183 226,183 177,134 177,66 226,17 294,17 343,66" fill="url(#beltGoldH)" stroke="#5e3d0e" stroke-width="2.5"/>
-      <polygon points="336,131 291,176 229,176 184,131 184,69 229,24 291,24 336,69" fill="none" stroke="#fff1c2" stroke-opacity=".55" stroke-width="1.2"/>
-      <polygon points="328,128 288,168 232,168 192,128 192,72 232,32 288,32 328,72" fill="url(#beltGold)" stroke="#6a4612" stroke-width="1.5"/>
-      <circle cx="260" cy="100" r="76" fill="none" stroke="#6a4612" stroke-width="1" opacity=".5"/>
-      <circle cx="260" cy="100" r="52" fill="url(#beltCore)" stroke="#5e3d0e" stroke-width="3"/>
-      <g fill="url(#beltGem)" stroke="#5e0614" stroke-width=".8">
-        <circle cx="339" cy="100" r="5.5"/><circle cx="316" cy="156" r="5.5"/><circle cx="260" cy="179" r="5.5"/><circle cx="204" cy="156" r="5.5"/>
-        <circle cx="181" cy="100" r="5.5"/><circle cx="204" cy="44" r="5.5"/><circle cx="260" cy="21" r="5.5"/><circle cx="316" cy="44" r="5.5"/>
-      </g>
-      <g font-family="Teko,sans-serif" font-weight="700" fill="#4a2f08" letter-spacing="3" font-size="15">
-        <text><textPath href="#beltArcTop" startOffset="50%" text-anchor="middle">ЧЕМПИОН</textPath></text>
-        <text><textPath href="#beltArcBot" startOffset="50%" text-anchor="middle">FC 26</textPath></text>
-      </g>
-      <!-- ball -->
-      <circle cx="260" cy="100" r="32" fill="#f7f8ff" stroke="#f2c14e" stroke-width="2.5"/>
-      <polygon points="260,88 271.4,96.3 267.1,109.7 252.9,109.7 248.6,96.3" fill="#0c0f24"/>
-      <g stroke="#0c0f24" stroke-width="2.2" fill="none">
-        <path d="M260 88 V69 M271.4 96.3 L289.5 90.4 M267.1 109.7 L278.3 125.2 M252.9 109.7 L241.7 125.2 M248.6 96.3 L230.5 90.4"/>
-      </g>
-      <g fill="#0c0f24">
-        <path d="M252 70 L260 69 L268 70 L265 73 L255 73Z"/>
-        <path d="M288 84 L291.5 92 L289 99 L286 95 L285.5 87Z"/>
-        <path d="M276 128 L282 121 L285 116 L280 117 L274 124Z"/>
-        <path d="M244 128 L238 121 L235 116 L240 117 L246 124Z"/>
-        <path d="M232 84 L228.5 92 L231 99 L234 95 L234.5 87Z"/>
-      </g>
-      <ellipse cx="250" cy="84" rx="12" ry="6" fill="#fff" opacity=".45"/>
-    </svg>
+    <img class="belt" src="belt.webp" width="600" height="321" alt="Чемпионский пояс">
     <div class="hero-txt">
       <div class="eyebrow" id="heroEye">Пояс чемпиона</div>
       <p class="holder" id="heroName">—</p>
@@ -256,6 +202,14 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
     <div class="ph"><h2 id="plH">Игроки</h2></div>
     <div class="chips" id="chips"></div>
     <div class="addp"><input type="text" id="newName" maxlength="24" placeholder="Имя или ник"><button class="btn2" id="addP">Добавить игрока</button></div>
+    <div class="reset">
+      <button class="linkBtn" id="resetOpen" type="button">Сбросить статистику</button>
+      <div class="resetBox" id="resetBox" hidden>
+        <div class="note">Все матчи и очки обнулятся у всех, начнётся новый сезон. Игроки останутся.</div>
+        <div class="addp"><input type="password" id="resetPass" autocomplete="off" placeholder="Пароль"><button class="btnDanger" id="resetGo" type="button">Сбросить</button></div>
+      </div>
+      <div class="msg" id="resetMsg" role="status"></div>
+    </div>
   </section>
 </div>
 
@@ -413,16 +367,28 @@ async function connect(){
   }catch(e){ setSync(false,'Нет связи'); return; }
   let gotP=false, gotM=false;
   const ok = () => { if(gotP&&gotM) setSync(true,'Онлайн'); };
+  watchMeta();
   fs.onSnapshot(fs.collection(fdb,'players'), s=>{
     S.players = s.docs.map(d=>({ ...d.data(), id:d.id, ts:tsOf(d.data()) })).sort((a,b)=>a.ts-b.ts);
     gotP=true; ok(); render();
   }, ()=>setSync(false,'Нет связи'));
   fs.onSnapshot(fs.collection(fdb,'matches'), s=>{
-    S.matches = s.docs.map(d=>({ ...d.data(), id:d.id, ts:tsOf(d.data()) }));
+    S.allMatches = s.docs.map(d=>({ ...d.data(), id:d.id, ts:tsOf(d.data()) })); applyReset();
     gotM=true; ok(); render();
   }, ()=>setSync(false,'Нет связи'));
 }
 const afterWrite = () => {};
+function applyReset(){ S.matches = (S.allMatches||[]).filter(m=>m.ts>(S.resetAt||0)); }
+function watchMeta(){
+  fs.onSnapshot(fs.doc(fdb,'meta','state'), d=>{ const v=d.data(); S.resetAt = v && v.resetAt && v.resetAt.toMillis ? v.resetAt.toMillis() : (v && v.resetAt===null ? Date.now() : 0); applyReset(); render(); }, ()=>{});
+}
+async function resetStats(pass){
+  const evt = 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+  const b = fs.writeBatch(fdb);
+  b.set(fs.doc(fdb,'resets',pass,'events',evt), { ts: fs.serverTimestamp() });
+  b.set(fs.doc(fdb,'meta','state'), { resetAt: fs.serverTimestamp(), evt });
+  await b.commit();
+}
 
 /* ---------- events ---------- */
 document.addEventListener('click', async ev=>{
@@ -455,6 +421,17 @@ document.addEventListener('click', async ev=>{
   }
 });
 $('newName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('addP').click(); });
+$('resetOpen').addEventListener('click',()=>{ $('resetBox').hidden=!$('resetBox').hidden; $('resetMsg').textContent=''; if(!$('resetBox').hidden) $('resetPass').focus(); });
+$('resetPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('resetGo').click(); });
+$('resetGo').addEventListener('click', async ()=>{
+  const p=$('resetPass').value.trim(), b=$('resetGo'), m=$('resetMsg');
+  if(!p){ $('resetPass').focus(); return; }
+  b.disabled=true;
+  try{ if(p.includes('/')) throw {code:'permission-denied'}; await resetStats(p);
+    $('resetPass').value=''; $('resetBox').hidden=true; S.week=0; S.all=false; m.className='msg ok'; m.textContent='Статистика сброшена. Новый сезон начался.'; render();
+  }catch(e){ m.className='msg err'; m.textContent = e && e.code==='permission-denied' ? 'Неверный пароль.' : 'Не получилось сбросить, попробуйте ещё раз.'; }
+  b.disabled=false;
+});
 document.addEventListener('click',e=>{ if(S.armed && !e.target.closest('.del')){ S.armed=null; render(); } }, true);
 
 /* ---------- boot ---------- */
