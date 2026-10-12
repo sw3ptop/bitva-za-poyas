@@ -208,6 +208,11 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
     <div class="ph"><h2 id="plH">Игроки</h2></div>
     <div class="chips" id="chips"></div>
     <div class="addp"><input type="text" id="newName" maxlength="24" placeholder="Имя или ник"><button class="btn2" id="addP">Добавить игрока</button></div>
+    <div class="resetBox" id="rmBox" hidden>
+      <div class="note" id="rmNote"></div>
+      <div class="addp"><input type="password" id="rmPass" autocomplete="off" placeholder="Пароль"><button class="btnDanger" id="rmGo" type="button">Убрать</button><button class="linkBtn" id="rmCancel" type="button">Отмена</button></div>
+    </div>
+    <div class="msg" id="rmMsg" role="status"></div>
     <div class="reset">
       <button class="linkBtn" id="resetOpen" type="button">Сбросить статистику</button>
       <div class="resetBox" id="resetBox" hidden>
@@ -355,7 +360,13 @@ async function addPlayer(name){
   if (S.players.some(p=>!p.archived && p.name.toLowerCase()===name.toLowerCase())) throw new ApiError('dup','Такой игрок уже есть');
   await fs.addDoc(fs.collection(fdb,'players'), { name: name.slice(0,24), color: PALETTE[S.players.length % PALETTE.length], archived:false, ts: fs.serverTimestamp() });
 }
-const archivePlayer = id => fs.updateDoc(fs.doc(fdb,'players',id), { archived:true });
+async function archivePlayer(id, pass){
+  const evt = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+  const b = fs.writeBatch(fdb);
+  b.set(fs.doc(fdb,'resets',pass,'events',evt), { ts: fs.serverTimestamp() });
+  b.update(fs.doc(fdb,'players',id), { archived:true, evt });
+  await b.commit();
+}
 const addMatch = m => fs.addDoc(fs.collection(fdb,'matches'), { p1:m.p1, p2:m.p2, g1:m.g1, g2:m.g2, ts: fs.serverTimestamp() });
 const delMatch = id => fs.deleteDoc(fs.doc(fdb,'matches',id));
 function writeErr(e){
@@ -406,8 +417,8 @@ document.addEventListener('click', async ev=>{
   const fail = e => { $('msg').className='msg err'; $('msg').textContent=writeErr(e); };
   if (b.dataset.del){ const id=b.dataset.del; if(S.armed!==id){ S.armed=id; render(); return; } S.armed=null;
     try{ await delMatch(id); $('msg').className='msg'; $('msg').textContent='Матч удалён.'; }catch(e){ fail(e); } afterWrite(); return; }
-  if (b.dataset.rmp){ const id=b.dataset.rmp; if(S.armed!==id){ S.armed=id; render(); return; } S.armed=null;
-    try{ await archivePlayer(id); }catch(e){ fail(e); } afterWrite(); return; }
+  if (b.dataset.rmp){ S.rmId=b.dataset.rmp; $('rmNote').textContent=`Убрать игрока «${nameOf(S.rmId)}»? Его сыгранные матчи останутся. Нужен пароль.`; $('rmBox').hidden=false; $('rmMsg').textContent=''; $('rmPass').value=''; $('rmPass').focus(); return; }
+
   if (b.id==='addP'){ const n=$('newName').value.trim(); if(!n){ $('newName').focus(); return; }
     b.disabled=true; try{ await addPlayer(n); $('newName').value=''; $('msg').className='msg'; $('msg').textContent=''; }catch(e){ fail(e); }
     b.disabled=false; afterWrite(); return; }
@@ -429,6 +440,17 @@ document.addEventListener('click', async ev=>{
 $('newName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('addP').click(); });
 $('resetOpen').addEventListener('click',()=>{ $('resetBox').hidden=!$('resetBox').hidden; $('resetMsg').textContent=''; if(!$('resetBox').hidden) $('resetPass').focus(); });
 $('resetPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('resetGo').click(); });
+$('rmCancel').addEventListener('click',()=>{ $('rmBox').hidden=true; S.rmId=null; });
+$('rmPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('rmGo').click(); });
+$('rmGo').addEventListener('click', async ()=>{
+  const p=$('rmPass').value.trim(), m=$('rmMsg'), b=$('rmGo');
+  if(!p || !S.rmId){ $('rmPass').focus(); return; }
+  b.disabled=true;
+  try{ if(p.includes('/')) throw {code:'permission-denied'}; const n=nameOf(S.rmId); await archivePlayer(S.rmId,p);
+    $('rmBox').hidden=true; S.rmId=null; m.className='msg ok'; m.textContent=`Игрок «${n}» убран.`;
+  }catch(e){ m.className='msg err'; m.textContent = e && e.code==='permission-denied' ? 'Неверный пароль.' : 'Не получилось, попробуйте ещё раз.'; }
+  b.disabled=false;
+});
 $('resetGo').addEventListener('click', async ()=>{
   const p=$('resetPass').value.trim(), b=$('resetGo'), m=$('resetMsg');
   if(!p){ $('resetPass').focus(); return; }
