@@ -193,7 +193,7 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
       <div class="rules">
         <b>3</b><span>за победу</span>
         <b>1</b><span>за ничью</span>
-        <b>+1</b><span>бонус за разгром (победа в 3+ мяча)</span>
+        <b>+1</b><span>бонус за разгром (победа в 5+ мячей)</span>
         <b>Р/М</b><span>при равенстве очков решает разница мячей, потом забитые</span>
       </div>
     </section>
@@ -250,7 +250,7 @@ function weekLabel(off){ const [s,e] = weekRange(off); return off===0 ? 'Эта 
 /* ---------- scoring ---------- */
 function pointsFor(m, side){
   const my = side===1 ? m.g1 : m.g2, th = side===1 ? m.g2 : m.g1;
-  if (my > th) return 3 + (my-th >= 3 ? 1 : 0);
+  if (my > th) return 3 + (my-th >= 5 ? 1 : 0);
   return my === th ? 1 : 0;
 }
 function standings(ms){
@@ -329,7 +329,7 @@ function renderResults(){
   $('resNote').textContent = ms.length ? `${ms.length} ${plural(ms.length,'матч','матча','матчей')}` : '';
   if (!ms.length){ $('results').innerHTML = `<div class="empty">За этот период матчей нет. Запишите первый в форме «Новый матч».</div>`; return; }
   $('results').innerHTML = ms.map(m=>{
-    const w1=m.g1>m.g2, w2=m.g2>m.g1, rout=Math.abs(m.g1-m.g2)>=3;
+    const w1=m.g1>m.g2, w2=m.g2>m.g1, rout=Math.abs(m.g1-m.g2)>=5;
     const t = new Date(m.ts).toLocaleString('ru-RU',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
     return `<div class="res"><div class="n ${w2?'lose':''}">${esc(nameOf(m.p1))}</div><div class="sc">${m.g1} : ${m.g2}</div><div class="n r ${w1?'lose':''}">${esc(nameOf(m.p2))}</div>
       <div class="meta"><span>${t}${rout?' · <span class="bonus">разгром +1</span>':''}</span>
