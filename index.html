@@ -134,6 +134,22 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
 .lock{font-size:11px;color:var(--muted);opacity:.7}
 .del .t{font-variant-numeric:tabular-nums;opacity:.75}
 
+/* head-to-head */
+.h2hs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.h2h{background:var(--pitch);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.h2h-top{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.hp{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;min-width:0}
+.hp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hp.r{justify-content:flex-end;text-align:right}
+.hp.lead span{color:var(--gold)}
+.hsc{font-family:var(--f-display);font-size:34px;line-height:1;font-weight:600;padding-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hsc i{font-style:normal;color:var(--muted);margin:0 5px}
+.h2h.none .hsc{color:var(--muted)}
+.h2h-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--line)}
+.h2h-bar i{display:block}
+.h2h-bar .d{background:#4a4436}
+.h2h-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
 @media (max-width:820px){
   .grid{grid-template-columns:1fr}
   .hero{grid-template-columns:1fr;justify-items:start}
@@ -198,6 +214,12 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
       </div>
     </section>
   </div>
+
+  <section class="panel" aria-labelledby="h2hH">
+    <div class="ph"><h2 id="h2hH">Личные встречи</h2><span class="note" id="h2hNote"></span></div>
+    <div class="note">Крупный счёт — сколько раз каждый выиграл у соперника.</div>
+    <div class="h2hs" id="h2h"></div>
+  </section>
 
   <section class="panel" aria-labelledby="resH">
     <div class="ph"><h2 id="resH">Результаты</h2><span class="note" id="resNote"></span></div>
@@ -284,7 +306,7 @@ function crest(id, size=28){
 
 /* ---------- render ---------- */
 function render(){
-  renderHero(); renderTable(); renderForm(); renderResults(); renderPlayers();
+  renderHero(); renderTable(); renderForm(); renderResults(); renderPlayers(); renderH2H();
   document.getElementById('app').classList.toggle('ro', !S.canWrite);
 }
 function renderHero(){
@@ -346,6 +368,28 @@ function renderPlayers(){
   $('chips').innerHTML = act.length ? act.map(p=>`<span class="chip">${crest(p.id,24)}${esc(p.name)}
     <button class="del ${S.armed===p.id?'arm':''}" data-rmp="${esc(p.id)}" aria-label="Убрать игрока">${S.armed===p.id?'Убрать?':'✕'}</button></span>`).join('')
     : '<span class="note">Игроков пока нет.</span>';
+}
+function renderH2H(){
+  const act=S.players.filter(p=>!p.archived);
+  const ms=S.all?S.matches:inWeek(S.week);
+  $('h2hNote').textContent = S.all ? 'Все матчи' : weekLabel(S.week);
+  const pairs=[];
+  for(let i=0;i<act.length;i++) for(let j=i+1;j<act.length;j++){
+    const A=act[i].id, B=act[j].id; let wa=0,wb=0,d=0,ga=0,gb=0,n=0;
+    ms.forEach(m=>{ let a,b; if(m.p1===A&&m.p2===B){a=m.g1;b=m.g2;} else if(m.p1===B&&m.p2===A){a=m.g2;b=m.g1;} else return;
+      n++; ga+=a; gb+=b; if(a>b) wa++; else if(b>a) wb++; else d++; });
+    pairs.push({A,B,wa,wb,d,ga,gb,n});
+  }
+  pairs.sort((x,y)=>y.n-x.n);
+  if(!pairs.length){ $('h2h').innerHTML='<div class="empty">Добавьте хотя бы двух игроков.</div>'; return; }
+  $('h2h').innerHTML=pairs.map(p=>{
+    const la=p.wa>p.wb, lb=p.wb>p.wa, ca=pl(p.A)?.color||'#9b9383', cb=pl(p.B)?.color||'#9b9383';
+    return `<div class="h2h${p.n?'':' none'}"><div class="h2h-top"><div class="hp${la?' lead':''}">${crest(p.A,24)}<span>${esc(nameOf(p.A))}</span></div>
+      <div class="hsc">${p.n?`${p.wa}<i>:</i>${p.wb}`:'—'}</div>
+      <div class="hp r${lb?' lead':''}"><span>${esc(nameOf(p.B))}</span>${crest(p.B,24)}</div></div>
+      ${p.n?`<div class="h2h-bar"><i style="flex:${p.wa};background:${ca}"></i><i class="d" style="flex:${p.d}"></i><i style="flex:${p.wb};background:${cb}"></i></div>`:''}
+      <div class="h2h-meta">${p.n?`<span>${p.n} ${plural(p.n,'матч','матча','матчей')} · ${p.d} ${plural(p.d,'ничья','ничьи','ничьих')}</span><span>Мячи ${p.ga}:${p.gb}</span>`:'<span>Ещё не играли в этот период</span>'}</div></div>`;
+  }).join('');
 }
 function left(m){ const s=Math.max(0,Math.ceil((S.delWin-(serverNow()-m.ts))/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
 const plural=(n,a,b,c)=>{const m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<10||h>=20)?b:c;};
