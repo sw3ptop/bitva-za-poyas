@@ -211,6 +211,7 @@ select,input[type=text]{width:100%;background:var(--pitch);border:1px solid var(
         <b>1</b><span>за ничью</span>
         <b>+1</b><span>бонус за разгром (победа в 5+ мячей)</span>
         <b>Р/М</b><span>при равенстве очков решает разница мячей, потом забитые</span>
+        <b>Пн–Пт</b><span>игровые дни. Суббота и воскресенье — выходные, пояс вручается после пятницы</span>
       </div>
     </section>
   </div>
@@ -270,7 +271,9 @@ const canDelete = m => serverNow() - m.ts < S.delWin;
 
 /* ---------- weeks (Mon–Sun, local time) ---------- */
 function weekStart(d){ const x = new Date(d); x.setHours(0,0,0,0); const k = (x.getDay()+6)%7; x.setDate(x.getDate()-k); return x; }
-function weekRange(off){ const s = weekStart(Date.now()); s.setDate(s.getDate()+7*off); const e = new Date(s); e.setDate(e.getDate()+7); return [s.getTime(), e.getTime()]; }
+function weekRange(off){ const s = weekStart(Date.now()); s.setDate(s.getDate()+7*off); const e = new Date(s); e.setDate(e.getDate()+5); return [s.getTime(), e.getTime()]; }
+const isWeekend = t => { const d = new Date(t).getDay(); return d===0 || d===6; };
+const allMs = () => S.matches.filter(m => !isWeekend(m.ts));
 const fmtD = t => new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'short'}).replace('.','');
 function weekLabel(off){ const [s,e] = weekRange(off); return off===0 ? 'Эта неделя' : off===-1 ? 'Прошлая неделя' : `${fmtD(s)} – ${fmtD(e-864e5)}`; }
 
@@ -310,20 +313,22 @@ function render(){
   document.getElementById('app').classList.toggle('ro', !S.canWrite);
 }
 function renderHero(){
-  const last = inWeek(-1), cur = inWeek(0);
-  const lastTop = last.length ? standings(last)[0] : null;
+  const wkEnd = isWeekend(Date.now());
+  const champMs = inWeek(wkEnd ? 0 : -1), cur = wkEnd ? [] : inWeek(0);
+  const champ = champMs.length ? standings(champMs)[0] : null;
   const curTop = cur.length ? standings(cur)[0] : null;
-  const holder = lastTop || curTop;
+  const holder = champ || curTop;
   if (!S.players.length){ $('heroEye').textContent='Пояс чемпиона'; $('heroName').textContent='Пояс свободен';
     $('heroSub').textContent='Добавьте игроков внизу страницы и запишите первый матч. Победитель недели забирает пояс.'; $('heroStats').innerHTML=''; return; }
   if (!holder){ $('heroEye').textContent='Пояс чемпиона'; $('heroName').textContent='Пояс свободен';
-    $('heroSub').textContent='На этой неделе ещё не было матчей. Первый, кто наберёт больше всех очков к воскресенью, заберёт пояс.'; $('heroStats').innerHTML=''; return; }
-  $('heroEye').textContent = lastTop ? 'Носит пояс · чемпион прошлой недели' : 'Претендент · лидер этой недели';
+    $('heroSub').textContent = wkEnd ? 'На этой неделе матчей не было. Выходные — битва продолжится в понедельник.' : 'На этой неделе ещё не было матчей. Кто наберёт больше всех очков к вечеру пятницы, заберёт пояс.'; $('heroStats').innerHTML=''; return; }
+  $('heroEye').textContent = champ ? (wkEnd ? 'Чемпион недели · выходные' : 'Носит пояс · чемпион прошлой недели') : 'Претендент · лидер этой недели';
   $('heroName').textContent = nameOf(holder.id);
-  const leader = curTop ? nameOf(curTop.id) : null;
-  $('heroSub').textContent = lastTop
-    ? (leader ? (curTop.id===lastTop.id ? `И на этой неделе тоже лидирует. Защищает титул.` : `Сейчас в лидерах ${leader} — пояс может сменить хозяина в воскресенье.`) : 'На этой неделе матчей ещё не было.')
-    : 'Неделя ещё идёт. Пояс достанется лидеру таблицы после воскресенья.';
+  $('heroSub').textContent = wkEnd
+    ? 'Неделя закрыта, пояс вручён. Суббота и воскресенье — выходные, новая битва начнётся в понедельник.'
+    : champ
+      ? (curTop ? (curTop.id===champ.id ? 'И на этой неделе тоже лидирует. Защищает титул.' : `Сейчас в лидерах ${nameOf(curTop.id)} — пояс может сменить хозяина в пятницу вечером.`) : 'На этой неделе матчей ещё не было.')
+      : 'Неделя ещё идёт. Пояс достанется лидеру таблицы после пятницы.';
   $('heroStats').innerHTML = [['Очки',holder.pts],['Победы',holder.w],['Забито',holder.gf],['Р/М',(holder.gf-holder.ga>0?'+':'')+(holder.gf-holder.ga)]]
     .map(([k,v])=>`<div class="hs"><b>${v}</b><span>${k}</span></div>`).join('');
 }
@@ -331,7 +336,7 @@ function renderTable(){
   $('weekLbl').textContent = S.all ? 'Все матчи' : weekLabel(S.week);
   $('nextW').disabled = S.all || S.week>=0; $('prevW').disabled = S.all;
   $('allT').classList.toggle('on', S.all);
-  const ms = S.all ? S.matches : inWeek(S.week);
+  const ms = S.all ? allMs() : inWeek(S.week);
   const rows = standings(ms);
   if (!rows.length){ $('tbody').innerHTML = `<tr><td colspan="10" style="font-family:var(--f-body);font-size:14px;color:var(--muted);border-radius:10px">Пока нет игроков</td></tr>`; return; }
   $('tbody').innerHTML = rows.map((r,i)=>{
@@ -350,9 +355,10 @@ function renderForm(){
     if (act.some(p=>p.id===v)) el.value=v; else if (act[i]) el.value=act[i].id; });
   $('save').disabled = act.length < 2;
   if (act.length<2 && !$('msg').textContent) $('msg').textContent = 'Нужно минимум два игрока.';
+  if (isWeekend(Date.now())){ $('save').disabled = true; $('msg').className='msg'; $('msg').textContent = 'Сегодня выходной: матчи записываются с понедельника по пятницу.'; }
 }
 function renderResults(){
-  const ms = (S.all ? S.matches : inWeek(S.week)).slice().sort((a,b)=>b.ts-a.ts);
+  const ms = (S.all ? allMs() : inWeek(S.week)).slice().sort((a,b)=>b.ts-a.ts);
   $('resNote').textContent = ms.length ? `${ms.length} ${plural(ms.length,'матч','матча','матчей')}` : '';
   if (!ms.length){ $('results').innerHTML = `<div class="empty">За этот период матчей нет. Запишите первый в форме «Новый матч».</div>`; return; }
   $('results').innerHTML = ms.map(m=>{
@@ -371,7 +377,7 @@ function renderPlayers(){
 }
 function renderH2H(){
   const act=S.players.filter(p=>!p.archived);
-  const ms=S.all?S.matches:inWeek(S.week);
+  const ms=S.all?allMs():inWeek(S.week);
   $('h2hNote').textContent = S.all ? 'Все матчи' : weekLabel(S.week);
   const pairs=[];
   for(let i=0;i<act.length;i++) for(let j=i+1;j<act.length;j++){
@@ -508,6 +514,7 @@ document.addEventListener('click',e=>{ if(S.armed && !e.target.closest('.del')){
 
 /* ---------- boot ---------- */
 render(); setSync(false,'Подключение…'); connect();
+setInterval(()=>{ renderHero(); renderForm(); }, 60000);
 setInterval(()=>{ if (S.matches.some(m=>Date.now()-m.ts<S.delWin+1500)) renderResults(); }, 1000);
 })();
 </script>
